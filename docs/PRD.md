@@ -1098,6 +1098,90 @@ GET    /api/projects/:id/ai-quota       # Check AI quota
 
 This comprehensive PRD provides a complete roadmap for implementing the AI Sprint Management App with clear specifications, error handling, a professional UI design system based on Atlassian Design Guidelines, and a phased approach to development.
 
+## 14. Development Rules & Guidelines
+
+### 14.1 Communication & Decision Making
+
+#### Discussion Before Implementation
+- **Always discuss before assuming**: Before implementing any feature or making architectural decisions, discuss the approach with the team/stakeholder
+- **Document decisions**: All major technical decisions should be documented with reasoning
+- **Seek clarification**: When requirements are unclear, ask for clarification rather than making assumptions
+
+#### Multiple Approach Evaluation
+- **Explain approach selection**: When multiple implementation approaches are possible, clearly explain:
+  - What approaches were considered
+  - Pros and cons of each approach
+  - Why the selected approach was chosen
+  - Trade-offs being made
+- **Consider alternatives**: Always evaluate at least 2-3 different approaches before settling on one
+- **Document rejected approaches**: Keep record of why certain approaches were not selected
+
+### 14.2 Version Control & Code Management
+
+#### Git Workflow Requirements
+- **Feature-based commits**: After completion of each feature, perform a git commit and push
+- **Atomic commits**: Each commit should represent a complete, working feature or fix
+- **Descriptive commit messages**: Use clear, descriptive commit messages following conventional commit format:
+  ```
+  feat: add user authentication system
+  fix: resolve issue with sprint date validation
+  docs: update API documentation for issue endpoints
+  refactor: optimize database queries for board loading
+  ```
+
+#### Commit Frequency
+- **After each feature**: Mandatory commit and push after completing any feature, no matter how small
+- **Before major changes**: Commit current work before starting major refactoring or new features
+- **End of day**: Always commit and push work at the end of each development session
+- **Before testing**: Commit stable code before running comprehensive tests
+
+#### Branch Management
+- **Feature branches**: Create separate branches for major features when appropriate
+- **Main branch protection**: Keep main branch stable and deployable
+- **Code review**: All significant changes should go through code review process
+
+### 14.3 Code Quality Standards
+
+#### Documentation Requirements
+- **Inline comments**: Complex logic should be documented with clear comments
+- **API documentation**: All endpoints must be documented with request/response examples
+- **README updates**: Keep project README updated with setup and deployment instructions
+- **Change logs**: Maintain changelog for significant updates
+
+#### Testing Requirements
+- **Unit tests**: Write unit tests for all business logic
+- **Integration tests**: Test API endpoints and database interactions
+- **Manual testing**: Perform manual testing before each commit
+- **Regression testing**: Ensure new changes don't break existing functionality
+
+### 14.4 Implementation Standards
+
+#### Error Handling
+- **Graceful degradation**: Handle errors gracefully with user-friendly messages
+- **Logging**: Implement comprehensive logging for debugging and monitoring
+- **Validation**: Validate all inputs on both frontend and backend
+- **Fallback mechanisms**: Provide fallbacks for external service failures (especially AI features)
+
+#### Performance Considerations
+- **Database optimization**: Optimize queries and use appropriate indexes
+- **Frontend optimization**: Minimize bundle size and optimize rendering
+- **Caching strategies**: Implement appropriate caching for frequently accessed data
+- **Rate limiting**: Implement rate limiting for API endpoints and AI features
+
+### 14.5 Collaboration Guidelines
+
+#### Communication Protocols
+- **Daily updates**: Provide daily progress updates on current work
+- **Blocker escalation**: Immediately communicate any blockers or issues
+- **Knowledge sharing**: Share learnings and solutions with the team
+- **Code reviews**: Participate actively in code review process
+
+#### Documentation Maintenance
+- **Keep PRD updated**: Update this PRD document when requirements change
+- **API documentation**: Maintain up-to-date API documentation
+- **Architecture decisions**: Document significant architectural changes
+- **Deployment guides**: Keep deployment and setup documentation current
+
 ## 15. User Journey & Screen Flow Documentation
 
 ### 15.1 Complete User Navigation Flow
