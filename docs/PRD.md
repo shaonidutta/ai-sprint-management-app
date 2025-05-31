@@ -138,6 +138,322 @@ FRONTEND_URL=http://localhost:3001
 - **Icons**: Custom icon library based on Atlaskit icons
 - **Build Tool**: Vite for fast development and building
 
+### 3.3 Frontend API Organization
+```
+frontend/src/api/
+├── config/
+│   └── axiosConfig.js         # Axios instance configuration
+├── interceptors/
+│   ├── authInterceptor.js     # Authentication and token refresh
+│   └── errorInterceptor.js    # Global error handling
+├── endpoints/
+│   └── index.js              # API endpoint constants
+└── index.js                  # Main API service with methods
+```
+
+#### API Configuration
+- **Base URL**: `http://localhost:3000/api` (configurable via env)
+- **Timeout**: 10 seconds (configurable)
+- **Content Type**: application/json
+- **Authorization**: Bearer token
+
+#### Interceptors
+1. **Auth Interceptor**
+   - Adds JWT token to requests
+   - Handles token refresh on 401
+   - Redirects to login on auth failure
+
+2. **Error Interceptor**
+   - Standardizes error responses
+   - Handles common HTTP status codes
+   - Development logging
+   - Validation error formatting
+
+#### API Service Methods
+Organized by domain:
+- auth: Login, register, password reset
+- users: Profile management
+- projects: CRUD + team management
+- boards: Kanban board operations
+- sprints: Sprint lifecycle
+- issues: Task management
+- ai: AI-powered features
+
+### 3.3 Frontend Services Organization
+```
+frontend/src/services/
+├── api/
+│   ├── config/
+│   │   └── axiosConfig.js         # Axios instance configuration
+│   ├── interceptors/
+│   │   ├── authInterceptor.js     # Authentication and token refresh
+│   │   └── errorInterceptor.js    # Global error handling
+│   └── endpoints/
+│       └── index.js               # API endpoint constants
+├── auth/
+│   ├── authService.js             # Authentication related operations
+│   └── authUtils.js              # Token management, session handling
+├── board/
+│   ├── boardService.js           # Board operations
+│   └── boardUtils.js             # Board helper functions
+├── sprint/
+│   ├── sprintService.js          # Sprint management
+│   └── sprintUtils.js            # Sprint calculations, validations
+├── issue/
+│   ├── issueService.js           # Issue CRUD operations
+│   └── issueUtils.js             # Issue helpers, formatters
+├── project/
+│   ├── projectService.js         # Project management
+│   └── projectUtils.js           # Project helpers
+├── user/
+│   ├── userService.js            # User profile operations
+│   └── userUtils.js              # User data helpers
+└── ai/
+    ├── aiService.js              # AI feature operations
+    └── aiUtils.js                # AI helpers, prompt formatting
+```
+
+Each service module follows a consistent pattern:
+- **Service Files**: Handle API calls and data operations
+- **Utils Files**: Contain helper functions, formatters, and calculations
+- **Clear Separation**: Each domain has its own service and utils
+
+#### Service Module Example (boardService.js):
+```javascript
+import api from '../api/config/axiosConfig';
+import { API_ENDPOINTS } from '../api/endpoints';
+
+export const boardService = {
+  // Get all boards for a project
+  getBoards: async (projectId) => {
+    const response = await api.get(API_ENDPOINTS.BOARDS.LIST(projectId));
+    return response.data;
+  },
+
+  // Get single board details
+  getBoard: async (boardId) => {
+    const response = await api.get(API_ENDPOINTS.BOARDS.DETAIL(boardId));
+    return response.data;
+  },
+
+  // Create new board
+  createBoard: async (projectId, data) => {
+    const response = await api.post(API_ENDPOINTS.BOARDS.CREATE(projectId), data);
+    return response.data;
+  },
+
+  // Update board
+  updateBoard: async (boardId, data) => {
+    const response = await api.put(API_ENDPOINTS.BOARDS.UPDATE(boardId), data);
+    return response.data;
+  },
+
+  // Delete board
+  deleteBoard: async (boardId) => {
+    const response = await api.delete(API_ENDPOINTS.BOARDS.DELETE(boardId));
+    return response.data;
+  }
+};
+```
+
+#### Utils Module Example (boardUtils.js):
+```javascript
+export const boardUtils = {
+  // Calculate board statistics
+  calculateBoardStats: (issues) => {
+    return {
+      totalIssues: issues.length,
+      completedIssues: issues.filter(i => i.status === 'Done').length,
+      blockedIssues: issues.filter(i => i.status === 'Blocked').length,
+      totalStoryPoints: issues.reduce((sum, i) => sum + (i.storyPoints || 0), 0)
+    };
+  },
+
+  // Format board data for display
+  formatBoardData: (board) => {
+    return {
+      ...board,
+      createdAt: new Date(board.createdAt).toLocaleDateString(),
+      issuesByStatus: groupIssuesByStatus(board.issues)
+    };
+  },
+
+  // Validate board data
+  validateBoardData: (data) => {
+    const errors = {};
+    if (!data.name) errors.name = 'Board name is required';
+    if (data.name?.length > 100) errors.name = 'Board name too long';
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+};
+```
+
+This organization provides:
+1. **Domain Separation**: Clear boundaries between different features
+2. **Code Reusability**: Utils can be shared across components
+3. **Maintainability**: Easy to find and update related code
+4. **Testing**: Isolated modules are easier to test
+5. **Scalability**: New services can be added without affecting others
+
+### 3.4 Frontend UI Components Organization
+
+The frontend UI components are organized into reusable modules following atomic design principles:
+
+```
+frontend/src/components/
+├── common/                  # Shared UI components
+│   ├── Input.jsx           # Form input component
+│   ├── Select.jsx          # Dropdown select component
+│   ├── Card.jsx            # Card container component
+│   ├── Modal.jsx           # Modal dialog component
+│   ├── Avatar.jsx          # User avatar component
+│   ├── Badge.jsx           # Status and priority badges
+│   ├── Tooltip.jsx         # Tooltip component
+│   └── index.js            # Common components barrel file
+├── board/                  # Board-specific components
+│   ├── KanbanBoard.jsx     # Main board component
+│   ├── KanbanColumn.jsx    # Board column component
+│   ├── IssueCard.jsx       # Issue card component
+│   ├── IssueModal.jsx      # Issue details/edit modal
+│   └── index.js            # Board components barrel file
+└── layout/                 # Layout components
+    ├── AppLayout.jsx       # Main application layout
+    ├── Header.jsx          # App header with navigation
+    └── Sidebar.jsx         # App sidebar with menu
+
+```
+
+#### Common Components
+
+1. **Input**
+   - Reusable form input component
+   - Supports different types (text, email, password, etc.)
+   - Includes error handling and validation
+   - Supports different sizes and variants
+
+2. **Select**
+   - Dropdown select component
+   - Supports single and multiple selection
+   - Custom styling and error handling
+   - Optional placeholder and helper text
+
+3. **Card**
+   - Container component for content
+   - Different elevation levels
+   - Optional header and footer
+   - Interactive variant for clickable cards
+
+4. **Modal**
+   - Dialog component for forms and details
+   - Different sizes and positions
+   - Custom header and footer
+   - Keyboard navigation support
+
+5. **Avatar**
+   - User avatar component
+   - Fallback to initials
+   - Different sizes and shapes
+   - Optional status indicator
+
+6. **Badge**
+   - Status and priority indicators
+   - Different variants and colors
+   - Optional dot indicator
+   - Removable variant
+
+7. **Tooltip**
+   - Information tooltip component
+   - Different positions
+   - Custom delay and animations
+   - Arrow indicator
+
+#### Board Components
+
+1. **KanbanBoard**
+   - Main board component
+   - Drag and drop functionality
+   - Swimlane support
+   - Loading and error states
+
+2. **KanbanColumn**
+   - Board column component
+   - Issue list container
+   - Column header with count
+   - Droppable area for issues
+
+3. **IssueCard**
+   - Issue representation
+   - Different view modes (board, list, compact)
+   - Priority and status indicators
+   - Assignee and metadata display
+
+4. **IssueModal**
+   - Issue details and edit form
+   - View and edit modes
+   - Field validation
+   - Activity timeline
+
+#### Layout Components
+
+1. **AppLayout**
+   - Main application structure
+   - Responsive design
+   - Navigation integration
+   - Content area management
+
+2. **Header**
+   - Application header
+   - User menu
+   - Global actions
+   - Navigation items
+
+3. **Sidebar**
+   - Main navigation menu
+   - Collapsible design
+   - Active state handling
+   - Icon and label display
+
+### Component Guidelines
+
+1. **Reusability**
+   - Components should be modular and reusable
+   - Props should be well-documented with PropTypes
+   - Default props for common use cases
+   - Consistent naming conventions
+
+2. **Accessibility**
+   - ARIA labels and roles
+   - Keyboard navigation support
+   - Color contrast compliance
+   - Screen reader compatibility
+
+3. **Performance**
+   - Lazy loading for large components
+   - Memoization for expensive calculations
+   - Efficient re-rendering
+   - Code splitting where appropriate
+
+4. **State Management**
+   - Local state for UI-specific logic
+   - Redux for global application state
+   - Context for theme and shared data
+   - Proper prop drilling avoidance
+
+5. **Styling**
+   - Tailwind CSS for utility classes
+   - Consistent color palette
+   - Responsive design patterns
+   - Dark mode support
+
+6. **Testing**
+   - Unit tests for components
+   - Integration tests for features
+   - Snapshot testing
+   - Accessibility testing
+
 ## 4. Database Schema (MySQL)
 
 ```sql

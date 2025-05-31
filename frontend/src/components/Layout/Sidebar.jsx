@@ -1,96 +1,73 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { 
-  HomeIcon, 
-  FolderIcon, 
-  ViewColumnsIcon, 
-  ChartBarIcon,
-  CogIcon,
-  UserGroupIcon
-} from '@heroicons/react/24/outline';
+  HomeIcon, ViewBoardsIcon, ProjectIcon, 
+  SprintIcon, SettingsIcon, AIIcon 
+} from '../common/Icons';
 
-const Sidebar = ({ isOpen, onClose }) => {
-  const location = useLocation();
+const Sidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Projects', href: '/projects', icon: FolderIcon },
-    { name: 'Boards', href: '/boards', icon: ViewColumnsIcon },
-    { name: 'Reports', href: '/reports', icon: ChartBarIcon },
-    { name: 'Team', href: '/team', icon: UserGroupIcon },
-    { name: 'Settings', href: '/settings', icon: CogIcon },
+  const navItems = [
+    { path: '/dashboard', icon: HomeIcon, label: 'Dashboard' },
+    { path: '/projects', icon: ProjectIcon, label: 'Projects' },
+    { path: '/boards', icon: ViewBoardsIcon, label: 'Boards' },
+    { path: '/sprints', icon: SprintIcon, label: 'Sprints' },
+    { path: '/ai-features', icon: AIIcon, label: 'AI Features' },
+    { path: '/settings', icon: SettingsIcon, label: 'Settings' },
   ];
 
-  const isActive = (href) => location.pathname === href;
-
   return (
-    <>
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-neutral-600 bg-opacity-75 z-20 lg:hidden"
-          onClick={onClose}
-        />
-      )}
+    <aside 
+      className={`
+        bg-gray-900 text-white transition-all duration-300 ease-in-out
+        ${isCollapsed ? 'w-16' : 'w-64'}
+      `}
+    >
+      {/* Logo */}
+      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-800">
+        {!isCollapsed && (
+          <span className="text-xl font-semibold">Sprint Manager</span>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-2 rounded hover:bg-gray-800"
+        >
+          {isCollapsed ? '→' : '←'}
+        </button>
+      </div>
 
-      {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex flex-col h-full">
-          {/* Sidebar header */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-200 lg:hidden">
-            <span className="text-lg font-semibold text-neutral-900">Menu</span>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-md text-neutral-400 hover:text-neutral-500 hover:bg-neutral-100"
-            >
-              <span className="sr-only">Close sidebar</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+      {/* Navigation */}
+      <nav className="mt-4">
+        {navItems.map(({ path, icon: Icon, label }) => (
+          <NavLink
+            key={path}
+            to={path}
+            className={({ isActive }) => `
+              flex items-center px-4 py-3 text-sm
+              ${isActive ? 'bg-blue-600' : 'hover:bg-gray-800'}
+              transition-colors duration-200
+            `}
+          >
+            <Icon className={`h-5 w-5 ${isCollapsed ? 'mx-auto' : 'mr-3'}`} />
+            {!isCollapsed && <span>{label}</span>}
+          </NavLink>
+        ))}
+      </nav>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`
-                    flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                    ${isActive(item.href)
-                      ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500'
-                      : 'text-neutral-700 hover:text-primary-600 hover:bg-neutral-50'
-                    }
-                  `}
-                  onClick={() => {
-                    // Close mobile sidebar when navigating
-                    if (window.innerWidth < 1024) {
-                      onClose();
-                    }
-                  }}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Sidebar footer */}
-          <div className="p-4 border-t border-neutral-200">
-            <div className="text-xs text-neutral-500">
-              AI Sprint Manager v1.0
+      {/* User Section */}
+      <div className="absolute bottom-0 w-full p-4 border-t border-gray-800">
+        {!isCollapsed && (
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-full bg-gray-700 mr-3" />
+            <div className="flex-1">
+              <div className="text-sm font-medium">John Doe</div>
+              <div className="text-xs text-gray-400">john@example.com</div>
             </div>
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </aside>
   );
 };
 
