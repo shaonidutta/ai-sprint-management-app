@@ -81,12 +81,22 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// API routes will be added here
-app.use('/api/v1', (req, res) => {
+// Import routes
+const authRoutes = require('./routes/auth');
+
+// API routes
+app.use('/api/v1/auth', authRoutes);
+
+// API root endpoint
+app.get('/api/v1', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'AI Sprint Management API v1.0',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      auth: '/api/v1/auth',
+      health: '/health'
+    }
   });
 });
 

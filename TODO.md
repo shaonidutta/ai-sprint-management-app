@@ -58,12 +58,12 @@
 ### 2.1 Backend Authentication
 - [x] **M2.1.1** Install JWT and bcrypt libraries ✅ COMPLETED
 - [x] **M2.1.2** Create User model and validation ✅ COMPLETED
-- [ ] **M2.1.3** Implement user registration endpoint
-- [ ] **M2.1.4** Implement password hashing
-- [ ] **M2.1.5** Implement login endpoint with JWT
-- [ ] **M2.1.6** Create JWT middleware for protected routes
-- [ ] **M2.1.7** Implement refresh token system
-- [ ] **M2.1.8** Create refresh_tokens table and logic
+- [x] **M2.1.3** Implement user registration endpoint ✅ COMPLETED
+- [x] **M2.1.4** Implement password hashing ✅ COMPLETED
+- [x] **M2.1.5** Implement login endpoint with JWT ✅ COMPLETED
+- [x] **M2.1.6** Create JWT middleware for protected routes ✅ COMPLETED
+- [x] **M2.1.7** Implement refresh token system ✅ COMPLETED
+- [x] **M2.1.8** Create refresh_tokens table and logic ✅ COMPLETED
 
 ### 2.2 Email Verification System
 - [ ] **M2.2.1** Install NodeMailer
