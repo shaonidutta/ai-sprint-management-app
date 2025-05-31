@@ -4,6 +4,7 @@ const logger = require('../config/logger');
 const emailService = require('../services/emailService');
 const { AppError } = require('../utils/errors');
 const { deleteOldAvatar } = require('../middleware/upload');
+const { logLogin, logLogout, logRegister, ACTIVITY_TYPES, logActivity } = require('../middleware/activityLogger');
 const path = require('path');
 
 // Register a new user
@@ -41,6 +42,13 @@ const register = async (req, res, next) => {
     }
 
     logger.info(`New user registered: ${user.email}`, { userId: user.id });
+
+    // Log registration activity
+    try {
+      await logRegister(req, user.id);
+    } catch (activityError) {
+      logger.error('Failed to log registration activity:', activityError);
+    }
 
     // Return user data without sensitive information
     res.status(201).json({
@@ -93,6 +101,13 @@ const login = async (req, res, next) => {
     await storeRefreshToken(user.id, refreshToken);
 
     logger.info(`User logged in: ${user.email}`, { userId: user.id });
+
+    // Log login activity
+    try {
+      await logLogin(req, user.id);
+    } catch (activityError) {
+      logger.error('Failed to log login activity:', activityError);
+    }
 
     res.json({
       success: true,
@@ -177,6 +192,15 @@ const logout = async (req, res, next) => {
     }
 
     logger.info(`User logged out`, { userId });
+
+    // Log logout activity
+    if (userId) {
+      try {
+        await logLogout(req, userId);
+      } catch (activityError) {
+        logger.error('Failed to log logout activity:', activityError);
+      }
+    }
 
     res.json({
       success: true,
@@ -552,6 +576,16 @@ const uploadAvatar = async (req, res, next) => {
       userId: user.id,
       filename: req.file.filename
     });
+
+    // Log avatar upload activity
+    try {
+      await logActivity(userId, ACTIVITY_TYPES.AVATAR_UPLOADED, {
+        details: { filename: req.file.filename },
+        req
+      });
+    } catch (activityError) {
+      logger.error('Failed to log avatar upload activity:', activityError);
+    }
 
     res.json({
       success: true,

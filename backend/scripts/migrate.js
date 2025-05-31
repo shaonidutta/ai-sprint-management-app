@@ -243,6 +243,25 @@ const createTables = async (connection) => {
       INDEX idx_user_id (user_id),
       INDEX idx_token (token),
       INDEX idx_expires_at (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+    // User activities table
+    `CREATE TABLE IF NOT EXISTS user_activities (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      action VARCHAR(100) NOT NULL,
+      resource_type VARCHAR(50) NULL,
+      resource_id INT NULL,
+      details JSON NULL,
+      ip_address VARCHAR(45) NULL,
+      user_agent TEXT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      INDEX idx_user_id (user_id),
+      INDEX idx_action (action),
+      INDEX idx_resource_type (resource_type),
+      INDEX idx_resource_id (resource_id),
+      INDEX idx_created_at (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`
   ];
 

@@ -91,6 +91,7 @@ const projectRoutes = require('./routes/projects');
 const boardRoutes = require('./routes/boards');
 const issueRoutes = require('./routes/issues');
 const sprintRoutes = require('./routes/sprints');
+const activityRoutes = require('./routes/activities');
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
@@ -98,6 +99,7 @@ app.use('/api/v1/projects', projectRoutes);
 app.use('/api/v1/boards', boardRoutes);
 app.use('/api/v1/issues', issueRoutes);
 app.use('/api/v1/sprints', sprintRoutes);
+app.use('/api/v1/activities', activityRoutes);
 
 // API root endpoint
 app.get('/api/v1', (req, res) => {
@@ -111,6 +113,7 @@ app.get('/api/v1', (req, res) => {
       boards: '/api/v1/boards',
       issues: '/api/v1/issues',
       sprints: '/api/v1/sprints',
+      activities: '/api/v1/activities',
       health: '/health'
     }
   });
