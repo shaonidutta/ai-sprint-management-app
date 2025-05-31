@@ -6,9 +6,11 @@ const authController = require('../controllers/authController');
 
 // Import validators
 const { validateRequest } = require('../validators/userValidator');
-const { 
-  registerSchema, 
-  loginSchema 
+const {
+  registerSchema,
+  loginSchema,
+  verifyEmailSchema,
+  forgotPasswordSchema
 } = require('../validators/userValidator');
 
 // Import middleware
@@ -56,9 +58,29 @@ router.post('/logout',
  * @desc    Get current user profile
  * @access  Private
  */
-router.get('/me', 
+router.get('/me',
   authMiddleware.authenticate,
   authController.getProfile
+);
+
+/**
+ * @route   POST /api/v1/auth/verify-email
+ * @desc    Verify user email address
+ * @access  Public
+ */
+router.post('/verify-email',
+  validateRequest(verifyEmailSchema),
+  authController.verifyEmail
+);
+
+/**
+ * @route   POST /api/v1/auth/resend-verification
+ * @desc    Resend email verification
+ * @access  Public
+ */
+router.post('/resend-verification',
+  validateRequest(forgotPasswordSchema), // Reuse email validation
+  authController.resendVerification
 );
 
 module.exports = router;

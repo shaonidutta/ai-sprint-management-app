@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 
 const logger = require('./config/logger');
 const database = require('./config/database');
+const emailService = require('./services/emailService');
 const { formatErrorResponse } = require('./utils/errors');
 
 const app = express();
@@ -138,7 +139,10 @@ const startServer = async () => {
   try {
     // Connect to database
     await database.connect();
-    
+
+    // Initialize email service
+    await emailService.initialize();
+
     // Start listening
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);

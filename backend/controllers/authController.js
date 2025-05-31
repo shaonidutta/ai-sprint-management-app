@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const database = require('../config/database');
 const logger = require('../config/logger');
+const emailService = require('../services/emailService');
 const { AppError } = require('../utils/errors');
 
 // Register a new user
@@ -23,6 +24,19 @@ const register = async (req, res, next) => {
     };
 
     const user = await User.create(userData);
+
+    // Send email verification if email service is configured
+    try {
+      if (emailService.isReady()) {
+        await emailService.sendEmailVerification(user, user.email_verification_token);
+        logger.info(`Email verification sent to ${user.email}`, { userId: user.id });
+      } else {
+        logger.warn('Email service not configured, skipping verification email');
+      }
+    } catch (emailError) {
+      logger.error('Failed to send verification email:', emailError);
+      // Don't fail registration if email fails
+    }
 
     logger.info(`New user registered: ${user.email}`, { userId: user.id });
 
@@ -266,10 +280,98 @@ const removeRefreshToken = async (userId, token) => {
   }
 };
 
+// Verify email address
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+
+    // Find user by verification token
+    const user = await User.findByEmailVerificationToken(token);
+    if (!user) {
+      return next(new AppError('Invalid or expired verification token', 400));
+    }
+
+    // Verify the email
+    await user.verifyEmail();
+
+    // Send welcome email if email service is configured
+    try {
+      if (emailService.isReady()) {
+        await emailService.sendWelcomeEmail(user);
+        logger.info(`Welcome email sent to ${user.email}`, { userId: user.id });
+      }
+    } catch (emailError) {
+      logger.error('Failed to send welcome email:', emailError);
+      // Don't fail verification if welcome email fails
+    }
+
+    logger.info(`Email verified for user: ${user.email}`, { userId: user.id });
+
+    res.json({
+      success: true,
+      message: 'Email verified successfully. Welcome to AI Sprint Manager!',
+      data: {
+        user: user.toJSON()
+      }
+    });
+
+  } catch (error) {
+    logger.error('Email verification error:', error);
+    next(new AppError('Email verification failed. Please try again.', 500));
+  }
+};
+
+// Resend email verification
+const resendVerification = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await User.findByEmail(email.toLowerCase().trim());
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Check if already verified
+    if (user.isVerified()) {
+      return next(new AppError('Email is already verified', 400));
+    }
+
+    // Generate new verification token
+    const { v4: uuidv4 } = require('uuid');
+    user.email_verification_token = uuidv4();
+    await user.save();
+
+    // Send verification email if email service is configured
+    try {
+      if (emailService.isReady()) {
+        await emailService.sendEmailVerification(user, user.email_verification_token);
+        logger.info(`Verification email resent to ${user.email}`, { userId: user.id });
+      } else {
+        return next(new AppError('Email service not configured', 503));
+      }
+    } catch (emailError) {
+      logger.error('Failed to resend verification email:', emailError);
+      return next(new AppError('Failed to send verification email. Please try again.', 500));
+    }
+
+    res.json({
+      success: true,
+      message: 'Verification email sent successfully. Please check your inbox.'
+    });
+
+  } catch (error) {
+    logger.error('Resend verification error:', error);
+    next(new AppError('Failed to resend verification email. Please try again.', 500));
+  }
+};
+
 module.exports = {
   register,
   login,
   refreshToken,
   logout,
-  getProfile
+  getProfile,
+  verifyEmail,
+  resendVerification
 };
