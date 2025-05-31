@@ -10,7 +10,9 @@ const {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
-  forgotPasswordSchema
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema
 } = require('../validators/userValidator');
 
 // Import middleware
@@ -81,6 +83,37 @@ router.post('/verify-email',
 router.post('/resend-verification',
   validateRequest(forgotPasswordSchema), // Reuse email validation
   authController.resendVerification
+);
+
+/**
+ * @route   POST /api/v1/auth/forgot-password
+ * @desc    Send password reset email
+ * @access  Public
+ */
+router.post('/forgot-password',
+  validateRequest(forgotPasswordSchema),
+  authController.forgotPassword
+);
+
+/**
+ * @route   POST /api/v1/auth/reset-password
+ * @desc    Reset password with token
+ * @access  Public
+ */
+router.post('/reset-password',
+  validateRequest(resetPasswordSchema),
+  authController.resetPassword
+);
+
+/**
+ * @route   POST /api/v1/auth/change-password
+ * @desc    Change password for authenticated user
+ * @access  Private
+ */
+router.post('/change-password',
+  authMiddleware.authenticate,
+  validateRequest(changePasswordSchema),
+  authController.changePassword
 );
 
 module.exports = router;

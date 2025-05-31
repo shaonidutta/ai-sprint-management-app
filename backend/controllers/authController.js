@@ -366,6 +366,117 @@ const resendVerification = async (req, res, next) => {
   }
 };
 
+// Forgot password - send reset email
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await User.findByEmail(email.toLowerCase().trim());
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return res.json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.'
+      });
+    }
+
+    // Check if user is active
+    if (!user.isActive()) {
+      return res.json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.'
+      });
+    }
+
+    // Generate password reset token
+    const resetToken = await user.generatePasswordResetToken();
+
+    // Send password reset email if email service is configured
+    try {
+      if (emailService.isReady()) {
+        await emailService.sendPasswordReset(user, resetToken);
+        logger.info(`Password reset email sent to ${user.email}`, { userId: user.id });
+      } else {
+        return next(new AppError('Email service not configured', 503));
+      }
+    } catch (emailError) {
+      logger.error('Failed to send password reset email:', emailError);
+      return next(new AppError('Failed to send password reset email. Please try again.', 500));
+    }
+
+    res.json({
+      success: true,
+      message: 'If an account with that email exists, a password reset link has been sent.'
+    });
+
+  } catch (error) {
+    logger.error('Forgot password error:', error);
+    next(new AppError('Failed to process password reset request. Please try again.', 500));
+  }
+};
+
+// Reset password with token
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    // Find user by password reset token
+    const user = await User.findByPasswordResetToken(token);
+    if (!user) {
+      return next(new AppError('Invalid or expired reset token', 400));
+    }
+
+    // Update password
+    await user.updatePassword(password);
+
+    logger.info(`Password reset successful for user: ${user.email}`, { userId: user.id });
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully. You can now login with your new password.'
+    });
+
+  } catch (error) {
+    logger.error('Reset password error:', error);
+    next(new AppError('Password reset failed. Please try again.', 500));
+  }
+};
+
+// Change password (for authenticated users)
+const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    if (!isCurrentPasswordValid) {
+      return next(new AppError('Current password is incorrect', 400));
+    }
+
+    // Update password
+    await user.updatePassword(newPassword);
+
+    logger.info(`Password changed for user: ${user.email}`, { userId: user.id });
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully.'
+    });
+
+  } catch (error) {
+    logger.error('Change password error:', error);
+    next(new AppError('Password change failed. Please try again.', 500));
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -373,5 +484,8 @@ module.exports = {
   logout,
   getProfile,
   verifyEmail,
-  resendVerification
+  resendVerification,
+  forgotPassword,
+  resetPassword,
+  changePassword
 };
