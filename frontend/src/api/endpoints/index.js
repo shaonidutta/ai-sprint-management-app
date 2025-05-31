@@ -1,0 +1,66 @@
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    LOGOUT: '/auth/logout',
+    REFRESH_TOKEN: '/auth/refresh-token',
+    VERIFY_EMAIL: '/auth/verify-email',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
+    ME: '/auth/me',
+  },
+  USERS: {
+    PROFILE: '/users/profile',
+    UPDATE_PROFILE: '/users/profile',
+    CHANGE_PASSWORD: '/users/change-password',
+  },
+  PROJECTS: {
+    BASE: '/projects',
+    DETAIL: (id) => `/projects/${id}`,
+    MEMBERS: {
+      LIST: (id) => `/projects/${id}/members`,
+      ADD: (id) => `/projects/${id}/members`,
+      UPDATE: (projectId, userId) => `/projects/${projectId}/members/${userId}`,
+      REMOVE: (projectId, userId) => `/projects/${projectId}/members/${userId}`,
+    },
+  },
+  BOARDS: {
+    LIST: (projectId) => `/projects/${projectId}/boards`,
+    DETAIL: (id) => `/boards/${id}`,
+    CREATE: (projectId) => `/projects/${projectId}/boards`,
+    UPDATE: (id) => `/boards/${id}`,
+    DELETE: (id) => `/boards/${id}`,
+  },
+  SPRINTS: {
+    LIST: (boardId) => `/boards/${boardId}/sprints`,
+    CREATE: (boardId) => `/boards/${boardId}/sprints`,
+    START: (id) => `/sprints/${id}/start`,
+    COMPLETE: (id) => `/sprints/${id}/complete`,
+  },
+  ISSUES: {
+    LIST: (boardId) => `/boards/${boardId}/issues`,
+    DETAIL: (id) => `/issues/${id}`,
+    CREATE: (boardId) => `/boards/${boardId}/issues`,
+    UPDATE: (id) => `/issues/${id}`,
+    DELETE: (id) => `/issues/${id}`,
+    COMMENTS: {
+      LIST: (issueId) => `/issues/${issueId}/comments`,
+      CREATE: (issueId) => `/issues/${issueId}/comments`,
+      UPDATE: (id) => `/comments/${id}`,
+      DELETE: (id) => `/comments/${id}`,
+    },
+    TIME_LOGS: {
+      LIST: (issueId) => `/issues/${issueId}/time-logs`,
+      CREATE: (issueId) => `/issues/${issueId}/time-logs`,
+      UPDATE: (id) => `/time-logs/${id}`,
+      DELETE: (id) => `/time-logs/${id}`,
+    },
+  },
+  AI: {
+    SPRINT_PLANNING: (projectId) => `/projects/${projectId}/ai/sprint-planning`,
+    SCOPE_CREEP: (projectId) => `/projects/${projectId}/ai/scope-creep-detection`,
+    RISK_ASSESSMENT: (projectId) => `/projects/${projectId}/ai/risk-assessment`,
+    RETROSPECTIVE: (projectId) => `/projects/${projectId}/ai/retrospective`,
+    QUOTA: (projectId) => `/projects/${projectId}/ai/quota`,
+  },
+}; 
