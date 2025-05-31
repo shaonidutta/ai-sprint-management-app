@@ -53,11 +53,11 @@
 ---
 
 ## Phase 2: Authentication System (Week 1-2)
-**Status**: ⏳ Pending | **Priority**: Must Have
+**Status**: 🔄 In Progress | **Priority**: Must Have
 
 ### 2.1 Backend Authentication
-- [ ] **M2.1.1** Install JWT and bcrypt libraries
-- [ ] **M2.1.2** Create User model and validation
+- [x] **M2.1.1** Install JWT and bcrypt libraries ✅ COMPLETED
+- [x] **M2.1.2** Create User model and validation ✅ COMPLETED
 - [ ] **M2.1.3** Implement user registration endpoint
 - [ ] **M2.1.4** Implement password hashing
 - [ ] **M2.1.5** Implement login endpoint with JWT
