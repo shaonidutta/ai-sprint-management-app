@@ -172,6 +172,30 @@ const userIdSchema = Joi.object({
     })
 });
 
+// Combined project ID and user ID parameter validation
+const projectUserIdSchema = Joi.object({
+  id: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      'number.base': 'Project ID must be a number',
+      'number.integer': 'Project ID must be an integer',
+      'number.positive': 'Project ID must be positive',
+      'any.required': 'Project ID is required'
+    }),
+  user_id: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      'number.base': 'User ID must be a number',
+      'number.integer': 'User ID must be an integer',
+      'number.positive': 'User ID must be positive',
+      'any.required': 'User ID is required'
+    })
+});
+
 // Validation middleware factory
 const validateRequest = (schema) => {
   return (req, res, next) => {
@@ -262,6 +286,7 @@ module.exports = {
   projectIdSchema,
   projectKeySchema,
   userIdSchema,
+  projectUserIdSchema,
   validateRequest,
   validateParams,
   validateQuery

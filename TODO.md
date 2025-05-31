@@ -117,11 +117,11 @@
 
 ### 3.3 Team Management System
 - [x] **M3.3.1** Create user_projects relationship table ✅ COMPLETED
-- [ ] **M3.3.2** Implement team member invitation system
-- [ ] **M3.3.3** Create role-based permissions middleware
-- [ ] **M3.3.4** Implement add/remove team members
-- [ ] **M3.3.5** Create team member listing endpoint
-- [ ] **M3.3.6** Implement role change functionality
+- [x] **M3.3.2** Implement team member invitation system ✅ COMPLETED
+- [x] **M3.3.3** Create role-based permissions middleware ✅ COMPLETED
+- [x] **M3.3.4** Implement add/remove team members ✅ COMPLETED
+- [x] **M3.3.5** Create team member listing endpoint ✅ COMPLETED
+- [x] **M3.3.6** Implement role change functionality ✅ COMPLETED
 
 ### 3.4 Frontend Project Management
 - [ ] **M3.4.1** Create Dashboard component (project listing)

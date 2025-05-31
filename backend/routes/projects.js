@@ -3,6 +3,7 @@ const router = express.Router();
 
 // Import controllers
 const projectController = require('../controllers/projectController');
+const teamController = require('../controllers/teamController');
 
 // Import validators
 const { 
@@ -10,11 +11,15 @@ const {
   validateParams, 
   validateQuery 
 } = require('../validators/projectValidator');
-const { 
+const {
   createProjectSchema,
   updateProjectSchema,
   projectSearchSchema,
-  projectIdSchema
+  projectIdSchema,
+  inviteTeamMemberSchema,
+  updateTeamMemberRoleSchema,
+  userIdSchema,
+  projectUserIdSchema
 } = require('../validators/projectValidator');
 
 // Import middleware
@@ -74,6 +79,54 @@ router.delete('/:id',
   authMiddleware.authenticate,
   validateParams(projectIdSchema),
   projectController.deleteProject
+);
+
+// Team Management Routes
+
+/**
+ * @route   GET /api/v1/projects/:id/team
+ * @desc    Get team members for a project
+ * @access  Private
+ */
+router.get('/:id/team',
+  authMiddleware.authenticate,
+  validateParams(projectIdSchema),
+  teamController.getTeamMembers
+);
+
+/**
+ * @route   POST /api/v1/projects/:id/team
+ * @desc    Invite team member to project
+ * @access  Private (Admin/Project Manager only)
+ */
+router.post('/:id/team',
+  authMiddleware.authenticate,
+  validateParams(projectIdSchema),
+  validateRequest(inviteTeamMemberSchema),
+  teamController.inviteTeamMember
+);
+
+/**
+ * @route   DELETE /api/v1/projects/:id/team/:user_id
+ * @desc    Remove team member from project
+ * @access  Private (Admin/Project Manager only)
+ */
+router.delete('/:id/team/:user_id',
+  authMiddleware.authenticate,
+  validateParams(projectUserIdSchema),
+  teamController.removeTeamMember
+);
+
+/**
+ * @route   PUT /api/v1/projects/:id/team/:user_id
+ * @desc    Update team member role
+ * @access  Private (Admin only)
+ */
+router.put('/:id/team/:user_id',
+  authMiddleware.authenticate,
+  validateParams(projectUserIdSchema),
+  validateRequest(updateTeamMemberRoleSchema),
+  teamController.updateTeamMemberRole
 );
 
 module.exports = router;
