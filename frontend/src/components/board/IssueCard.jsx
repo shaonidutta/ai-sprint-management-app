@@ -1,220 +1,132 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Badge, Avatar, Tooltip } from '../common';
+import { Avatar, Badge } from '../common';
 
-const IssueCard = ({
-  issue,
-  onClick,
-  view = 'board', // board, list, compact
-  className = '',
-}) => {
-  const getPriorityBadge = (priority) => {
-    switch (priority) {
-      case 'P1':
-        return <Badge variant="priority-p1" size="small">P1</Badge>;
-      case 'P2':
-        return <Badge variant="priority-p2" size="small">P2</Badge>;
-      case 'P3':
-        return <Badge variant="priority-p3" size="small">P3</Badge>;
-      case 'P4':
-        return <Badge variant="priority-p4" size="small">P4</Badge>;
-      default:
-        return null;
-    }
-  };
+const priorityColors = {
+  P1: 'bg-red-100 text-red-800',
+  P2: 'bg-orange-100 text-orange-800',
+  P3: 'bg-yellow-100 text-yellow-800',
+  P4: 'bg-green-100 text-green-800',
+};
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'To Do':
-        return <Badge variant="status-todo" size="small">To Do</Badge>;
-      case 'In Progress':
-        return <Badge variant="status-in-progress" size="small">In Progress</Badge>;
-      case 'Done':
-        return <Badge variant="status-done" size="small">Done</Badge>;
-      case 'Blocked':
-        return <Badge variant="status-blocked" size="small">Blocked</Badge>;
-      default:
-        return null;
-    }
-  };
+const statusColors = {
+  'To Do': 'bg-gray-100 text-gray-800',
+  'In Progress': 'bg-blue-100 text-blue-800',
+  'Done': 'bg-green-100 text-green-800',
+  'Blocked': 'bg-red-100 text-red-800',
+};
 
-  const renderBoardView = () => (
-    <Card
-      variant="default"
-      elevation="low"
-      interactive
+const typeIcons = {
+  bug: '🐛',
+  task: '📋',
+  story: '📖',
+  epic: '🏆',
+};
+
+const IssueCard = ({ issue, onClick, view = 'list' }) => {
+  const {
+    key,
+    title,
+    type,
+    status,
+    priority,
+    assignee,
+    updatedAt,
+  } = issue;
+
+  const cardClasses = `
+    bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow
+    ${view === 'board' ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}
+  `;
+
+  const formattedDate = new Date(updatedAt).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+  return (
+    <div
+      className={cardClasses}
       onClick={onClick}
-      className={`hover:border-blue-300 ${className}`}
+      role="button"
+      tabIndex={0}
+      onKeyPress={(e) => e.key === 'Enter' && onClick()}
     >
-      {/* Issue Header */}
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center space-x-2">
-          {issue.type && (
-            <Tooltip content={issue.type}>
-              <span className="text-gray-500">
-                {issue.type === 'bug' ? '🐛' : '✨'}
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            {type && (
+              <span title={`Type: ${type}`} className="text-lg">
+                {typeIcons[type.toLowerCase()] || '📄'}
               </span>
-            </Tooltip>
-          )}
-          <span className="text-xs text-gray-500">
-            {issue.key}
-          </span>
-        </div>
-        {getPriorityBadge(issue.priority)}
-      </div>
+            )}
+            <span className="text-sm font-mono text-gray-500">{key}</span>
+          </div>
+          
+          <h3 className="text-sm font-medium text-gray-900 truncate mb-2">
+            {title}
+          </h3>
 
-      {/* Issue Title */}
-      <h4 className="text-sm font-medium text-gray-900 mb-2">
-        {issue.title}
-      </h4>
-
-      {/* Issue Footer */}
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex items-center space-x-2">
-          {issue.assignee && (
-            <Tooltip content={issue.assignee.name}>
-              <div>
-                <Avatar
-                  src={issue.assignee.avatar}
-                  alt={issue.assignee.name}
-                  size="tiny"
-                />
-              </div>
-            </Tooltip>
-          )}
-          {issue.storyPoints && (
-            <span className="text-xs text-gray-500">
-              {issue.storyPoints} pts
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge
+              label={status}
+              className={statusColors[status]}
+            />
+            <Badge
+              label={priority}
+              className={priorityColors[priority]}
+            />
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {issue.dueDate && (
-            <Tooltip content={new Date(issue.dueDate).toLocaleDateString()}>
-              <span className="text-xs text-gray-500">
-                📅
-              </span>
-            </Tooltip>
-          )}
-          {issue.comments > 0 && (
-            <Tooltip content={`${issue.comments} comments`}>
-              <span className="text-xs text-gray-500">
-                💬 {issue.comments}
-              </span>
-            </Tooltip>
-          )}
-        </div>
-      </div>
-    </Card>
-  );
-
-  const renderListView = () => (
-    <Card
-      variant="default"
-      elevation="low"
-      interactive
-      onClick={onClick}
-      className={`hover:border-blue-300 ${className}`}
-    >
-      <div className="flex items-center">
-        {/* Issue Key and Type */}
-        <div className="flex items-center space-x-3 w-32">
-          {issue.type && (
-            <Tooltip content={issue.type}>
-              <span className="text-gray-500">
-                {issue.type === 'bug' ? '🐛' : '✨'}
-              </span>
-            </Tooltip>
-          )}
-          <span className="text-sm text-gray-500">
-            {issue.key}
-          </span>
-        </div>
-
-        {/* Issue Title */}
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-gray-900 truncate">
-            {issue.title}
-          </h4>
-        </div>
-
-        {/* Status */}
-        <div className="ml-4 w-32">
-          {getStatusBadge(issue.status)}
-        </div>
-
-        {/* Priority */}
-        <div className="ml-4 w-24">
-          {getPriorityBadge(issue.priority)}
-        </div>
-
-        {/* Assignee */}
-        <div className="ml-4 w-32">
-          {issue.assignee && (
-            <div className="flex items-center space-x-2">
+        {view === 'list' && (
+          <div className="flex flex-col items-end gap-2">
+            {assignee && (
               <Avatar
-                src={issue.assignee.avatar}
-                alt={issue.assignee.name}
-                size="tiny"
+                src={assignee.avatar}
+                alt={assignee.name}
+                size="sm"
+                title={`Assigned to ${assignee.name}`}
               />
-              <span className="text-sm text-gray-600 truncate">
-                {issue.assignee.name}
+            )}
+            <time
+              dateTime={updatedAt}
+              className="text-xs text-gray-500"
+              title="Last updated"
+            >
+              {formattedDate}
+            </time>
+          </div>
+        )}
+      </div>
+
+      {view === 'board' && (
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+          {assignee && (
+            <div className="flex items-center gap-2">
+              <Avatar
+                src={assignee.avatar}
+                alt={assignee.name}
+                size="sm"
+              />
+              <span className="text-xs text-gray-500 truncate">
+                {assignee.name}
               </span>
             </div>
           )}
+          <time
+            dateTime={updatedAt}
+            className="text-xs text-gray-500"
+            title="Last updated"
+          >
+            {formattedDate}
+          </time>
         </div>
-
-        {/* Story Points */}
-        <div className="ml-4 w-16 text-right">
-          {issue.storyPoints && (
-            <span className="text-sm text-gray-500">
-              {issue.storyPoints} pts
-            </span>
-          )}
-        </div>
-      </div>
-    </Card>
-  );
-
-  const renderCompactView = () => (
-    <div
-      className={`
-        flex items-center py-2 px-3 hover:bg-gray-50 cursor-pointer
-        ${className}
-      `}
-      onClick={onClick}
-    >
-      <div className="flex items-center space-x-2 w-32">
-        {issue.type && (
-          <span className="text-gray-500">
-            {issue.type === 'bug' ? '🐛' : '✨'}
-          </span>
-        )}
-        <span className="text-xs text-gray-500">{issue.key}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm text-gray-900 truncate">{issue.title}</h4>
-      </div>
-      {issue.assignee && (
-        <Avatar
-          src={issue.assignee.avatar}
-          alt={issue.assignee.name}
-          size="tiny"
-          className="ml-2"
-        />
       )}
     </div>
   );
-
-  switch (view) {
-    case 'list':
-      return renderListView();
-    case 'compact':
-      return renderCompactView();
-    default:
-      return renderBoardView();
-  }
 };
 
 IssueCard.propTypes = {
@@ -224,18 +136,16 @@ IssueCard.propTypes = {
     title: PropTypes.string.isRequired,
     type: PropTypes.string,
     status: PropTypes.string.isRequired,
-    priority: PropTypes.string,
+    priority: PropTypes.string.isRequired,
     assignee: PropTypes.shape({
-      name: PropTypes.string.isRequired,
+      id: PropTypes.string,
+      name: PropTypes.string,
       avatar: PropTypes.string,
     }),
-    storyPoints: PropTypes.number,
-    dueDate: PropTypes.string,
-    comments: PropTypes.number,
+    updatedAt: PropTypes.string.isRequired,
   }).isRequired,
   onClick: PropTypes.func.isRequired,
-  view: PropTypes.oneOf(['board', 'list', 'compact']),
-  className: PropTypes.string,
+  view: PropTypes.oneOf(['list', 'board']),
 };
 
 export default IssueCard; 
