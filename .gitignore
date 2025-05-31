@@ -184,6 +184,10 @@ frontend/uploads/
 *.sqlite3
 *.db
 
+# Sample data files (contains test data, not for production)
+backend/sample_data.sql
+**/sample_data.sql
+
 # Temporary files
 tmp/
 temp/
