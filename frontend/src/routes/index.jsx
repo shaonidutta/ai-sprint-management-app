@@ -6,6 +6,11 @@ import RootLayout from '../components/Layout/RootLayout';
 import Login from '../pages/auth/Login';
 import EmailVerificationPending from '../pages/auth/EmailVerificationPending';
 import Register from '../pages/auth/Register';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import Dashboard from '../pages/Dashboard';
+import ProjectPage from '../pages/project/ProjectPage';
+import BoardPage from '../pages/board/BoardPage';
+import ProfilePage from '../pages/profile/ProfilePage';
 
 
 export const routes = [
@@ -36,6 +41,28 @@ export const routes = [
       {
         path: '/verify-email',
         element: <EmailVerificationPending />,
+      },
+      // Protected Routes
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <Dashboard />,
+          },
+          {
+            path: '/projects/:id',
+            element: <ProjectPage />,
+          },
+          {
+            path: '/boards/:id',
+            element: <BoardPage />,
+          },
+          {
+            path: '/profile',
+            element: <ProfilePage />,
+          },
+        ]
       }
     ]
   }
