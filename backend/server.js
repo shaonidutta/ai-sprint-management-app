@@ -9,7 +9,9 @@ const rateLimit = require('express-rate-limit');
 const logger = require('./config/logger');
 const database = require('./config/database');
 const emailService = require('./services/emailService');
+const aiService = require('./services/aiService');
 const { formatErrorResponse } = require('./utils/errors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -93,6 +95,7 @@ const issueRoutes = require('./routes/issues');
 const sprintRoutes = require('./routes/sprints');
 const activityRoutes = require('./routes/activities');
 const kanbanRoutes = require('./routes/kanban');
+const aiRoutes = require('./routes/ai');
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
@@ -102,6 +105,7 @@ app.use('/api/v1/issues', issueRoutes);
 app.use('/api/v1/sprints', sprintRoutes);
 app.use('/api/v1/activities', activityRoutes);
 app.use('/api/v1/kanban', kanbanRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 // API root endpoint
 app.get('/api/v1', (req, res) => {
@@ -117,6 +121,7 @@ app.get('/api/v1', (req, res) => {
       sprints: '/api/v1/sprints',
       activities: '/api/v1/activities',
       kanban: '/api/v1/kanban',
+      ai: '/api/v1/ai',
       health: '/health'
     }
   });
@@ -164,11 +169,15 @@ const startServer = async () => {
     // Initialize email service
     await emailService.initialize();
 
+    // Initialize AI service
+    await aiService.initialize();
+
     // Start listening
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
       logger.info(`Health check available at http://localhost:${PORT}/health`);
       logger.info(`API available at http://localhost:${PORT}/api/v1`);
+      logger.info(`AI service status: ${aiService.isReady() ? 'Ready' : 'Not available'}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
