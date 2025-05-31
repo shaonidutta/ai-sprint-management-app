@@ -66,7 +66,7 @@
 - [x] **M2.1.8** Create refresh_tokens table and logic ✅ COMPLETED
 
 ### 2.2 Email Verification System
-- [ ] **M2.2.1** Install NodeMailer
+- [x] **M2.2.1** Install NodeMailer ✅ COMPLETED
 - [ ] **M2.2.2** Setup SMTP configuration
 - [ ] **M2.2.3** Create email_verifications table
 - [ ] **M2.2.4** Implement email verification endpoint
