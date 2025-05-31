@@ -20,9 +20,19 @@ const createDatabase = async () => {
     await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
     logger.info(`Database '${process.env.DB_NAME}' created or already exists`);
 
-    // Use the database
-    await connection.execute(`USE \`${process.env.DB_NAME}\``);
-    logger.info(`Using database '${process.env.DB_NAME}'`);
+    // Close the connection and reconnect with the database specified
+    await connection.end();
+
+    // Reconnect with the database
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    });
+
+    logger.info(`Connected to database '${process.env.DB_NAME}'`);
 
     // Create tables
     await createTables(connection);
