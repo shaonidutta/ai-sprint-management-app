@@ -82,6 +82,9 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Serve static files for uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Import routes
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');

@@ -18,6 +18,7 @@ const {
 
 // Import middleware
 const authMiddleware = require('../middleware/auth');
+const { avatarUpload, handleUploadError } = require('../middleware/upload');
 
 /**
  * @route   POST /api/v1/auth/register
@@ -126,6 +127,28 @@ router.post('/change-password',
   authMiddleware.authenticate,
   validateRequest(changePasswordSchema),
   authController.changePassword
+);
+
+/**
+ * @route   POST /api/v1/auth/upload-avatar
+ * @desc    Upload user avatar
+ * @access  Private
+ */
+router.post('/upload-avatar',
+  authMiddleware.authenticate,
+  avatarUpload,
+  handleUploadError,
+  authController.uploadAvatar
+);
+
+/**
+ * @route   DELETE /api/v1/auth/delete-avatar
+ * @desc    Delete user avatar
+ * @access  Private
+ */
+router.delete('/delete-avatar',
+  authMiddleware.authenticate,
+  authController.deleteAvatar
 );
 
 module.exports = router;
