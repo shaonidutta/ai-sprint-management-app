@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0052CC;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0747A6;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #e6ffed;
+            border: 1px solid #52c41a;
+            color: #389e0d;
+        }
+        .error {
+            background-color: #fff2f0;
+            border: 1px solid #ff4d4f;
+            color: #cf1322;
+        }
+        .info {
+            background-color: #e6f7ff;
+            border: 1px solid #1890ff;
+            color: #0050b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 AI Sprint Management - Auth API Test</h1>
+    
+    <div class="container">
+        <h2>📊 Server Health Check</h2>
+        <button onclick="testHealth()">Check Server Health</button>
+        <div id="healthResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h2>📝 User Registration</h2>
+        <div class="form-group">
+            <label>First Name:</label>
+            <input type="text" id="regFirstName" value="John">
+        </div>
+        <div class="form-group">
+            <label>Last Name:</label>
+            <input type="text" id="regLastName" value="Doe">
+        </div>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="regEmail" value="john.doe@example.com">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="regPassword" value="password123">
+        </div>
+        <button onclick="testRegister()">Register User</button>
+        <div id="registerResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔐 User Login</h2>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="loginEmail" value="test@example.com">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="loginPassword" value="password123">
+        </div>
+        <button onclick="testLogin()">Login User</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h2>👤 Get User Profile</h2>
+        <p>Use the access token from login to test this endpoint:</p>
+        <div class="form-group">
+            <label>Access Token:</label>
+            <input type="text" id="accessToken" placeholder="Paste access token here">
+        </div>
+        <button onclick="testProfile()">Get Profile</button>
+        <div id="profileResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/v1';
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        function displayResult(elementId, result, isSuccess = null) {
+            const element = document.getElementById(elementId);
+            const success = isSuccess !== null ? isSuccess : result.success;
+            
+            element.className = `result ${success ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testHealth() {
+            const result = await makeRequest(`${API_BASE.replace('/api/v1', '')}/health`);
+            displayResult('healthResult', result);
+        }
+
+        async function testRegister() {
+            const data = {
+                first_name: document.getElementById('regFirstName').value,
+                last_name: document.getElementById('regLastName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value
+            };
+
+            const result = await makeRequest(`${API_BASE}/auth/register`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            displayResult('registerResult', result);
+        }
+
+        async function testLogin() {
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            const result = await makeRequest(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            displayResult('loginResult', result);
+            
+            // Auto-fill access token if login successful
+            if (result.success && result.data?.data?.tokens?.access_token) {
+                document.getElementById('accessToken').value = result.data.data.tokens.access_token;
+            }
+        }
+
+        async function testProfile() {
+            const token = document.getElementById('accessToken').value;
+            
+            if (!token) {
+                displayResult('profileResult', { error: 'Please provide an access token' }, false);
+                return;
+            }
+
+            const result = await makeRequest(`${API_BASE}/auth/me`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            displayResult('profileResult', result);
+        }
+
+        // Test server health on page load
+        window.onload = function() {
+            testHealth();
+        };
+    </script>
+</body>
+</html>
