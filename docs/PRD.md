@@ -2660,3 +2660,45 @@ Landing Page → Auth Flow → Dashboard → Projects → Boards → Issues → 
 - **Account Issues**: Redirect to appropriate resolution screens
 
 This comprehensive user journey documentation provides complete screen flows, API mappings, and detailed request/response models for the entire AI Sprint Management App.
+
+### 3.4 Frontend Route Structure
+```
+/
+├── /login                       # Login page
+├── /register                    # Registration page
+├── /forgot-password            # Forgot password page
+├── /reset-password             # Reset password page
+├── /verify-email               # Email verification page
+├── /                          # Dashboard (protected)
+├── /profile                   # User profile (protected)
+├── /settings                  # App settings (protected)
+├── /projects                  # Projects list (protected)
+│   ├── /:projectId           # Project details
+│   ├── /:projectId/settings  # Project settings
+│   └── /:projectId/team      # Project team management
+├── /boards                    # Boards list (protected)
+│   ├── /:boardId             # Board details/Kanban view
+│   └── /:boardId/settings    # Board settings
+├── /sprints                  # Sprints list (protected)
+│   ├── /:sprintId           # Sprint details
+│   ├── /:sprintId/planning  # Sprint planning
+│   └── /:sprintId/retro     # Sprint retrospective
+└── /ai-features             # AI features (protected)
+    ├── /sprint-planning     # AI-assisted sprint planning
+    ├── /risk-assessment    # Sprint risk assessment
+    └── /insights           # AI-generated insights
+```
+
+Each route is protected by the authentication system except for:
+- /login
+- /register
+- /forgot-password
+- /reset-password
+- /verify-email
+
+The route structure follows these principles:
+1. RESTful URL patterns for resource identification
+2. Clear hierarchy for nested resources
+3. Consistent naming conventions
+4. Logical grouping of related features
+5. Separation of public and protected routes
