@@ -3,6 +3,9 @@ const database = require('../config/database');
 const logger = require('../config/logger');
 const emailService = require('../services/emailService');
 const { AppError } = require('../utils/errors');
+const { deleteOldAvatar } = require('../middleware/upload');
+const { logLogin, logLogout, logRegister, ACTIVITY_TYPES, logActivity } = require('../middleware/activityLogger');
+const path = require('path');
 
 // Register a new user
 const register = async (req, res, next) => {
@@ -39,6 +42,13 @@ const register = async (req, res, next) => {
     }
 
     logger.info(`New user registered: ${user.email}`, { userId: user.id });
+
+    // Log registration activity
+    try {
+      await logRegister(req, user.id);
+    } catch (activityError) {
+      logger.error('Failed to log registration activity:', activityError);
+    }
 
     // Return user data without sensitive information
     res.status(201).json({
@@ -91,6 +101,13 @@ const login = async (req, res, next) => {
     await storeRefreshToken(user.id, refreshToken);
 
     logger.info(`User logged in: ${user.email}`, { userId: user.id });
+
+    // Log login activity
+    try {
+      await logLogin(req, user.id);
+    } catch (activityError) {
+      logger.error('Failed to log login activity:', activityError);
+    }
 
     res.json({
       success: true,
@@ -175,6 +192,15 @@ const logout = async (req, res, next) => {
     }
 
     logger.info(`User logged out`, { userId });
+
+    // Log logout activity
+    if (userId) {
+      try {
+        await logLogout(req, userId);
+      } catch (activityError) {
+        logger.error('Failed to log logout activity:', activityError);
+      }
+    }
 
     res.json({
       success: true,
@@ -519,6 +545,114 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
+// Upload avatar
+const uploadAvatar = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // Check if file was uploaded
+    if (!req.file) {
+      return next(new AppError('No avatar file provided', 400));
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Delete old avatar if exists
+    if (user.avatar_url) {
+      const oldAvatarPath = path.join(process.cwd(), user.avatar_url);
+      deleteOldAvatar(oldAvatarPath);
+    }
+
+    // Update user with new avatar URL
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    user.avatar_url = avatarUrl;
+    await user.save();
+
+    logger.info(`Avatar uploaded for user: ${user.email}`, {
+      userId: user.id,
+      filename: req.file.filename
+    });
+
+    // Log avatar upload activity
+    try {
+      await logActivity(userId, ACTIVITY_TYPES.AVATAR_UPLOADED, {
+        details: { filename: req.file.filename },
+        req
+      });
+    } catch (activityError) {
+      logger.error('Failed to log avatar upload activity:', activityError);
+    }
+
+    res.json({
+      success: true,
+      message: 'Avatar uploaded successfully.',
+      data: {
+        user: user.toJSON(),
+        avatar_url: avatarUrl
+      }
+    });
+
+  } catch (error) {
+    logger.error('Avatar upload error:', error);
+
+    // Clean up uploaded file if error occurs
+    if (req.file) {
+      try {
+        const fs = require('fs');
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupError) {
+        logger.error('Failed to cleanup uploaded file:', cleanupError);
+      }
+    }
+
+    next(new AppError('Avatar upload failed. Please try again.', 500));
+  }
+};
+
+// Delete avatar
+const deleteAvatar = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Check if user has an avatar
+    if (!user.avatar_url) {
+      return next(new AppError('No avatar to delete', 400));
+    }
+
+    // Delete avatar file
+    const avatarPath = path.join(process.cwd(), user.avatar_url);
+    deleteOldAvatar(avatarPath);
+
+    // Update user
+    user.avatar_url = null;
+    await user.save();
+
+    logger.info(`Avatar deleted for user: ${user.email}`, { userId: user.id });
+
+    res.json({
+      success: true,
+      message: 'Avatar deleted successfully.',
+      data: {
+        user: user.toJSON()
+      }
+    });
+
+  } catch (error) {
+    logger.error('Avatar delete error:', error);
+    next(new AppError('Avatar deletion failed. Please try again.', 500));
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -526,6 +660,8 @@ module.exports = {
   logout,
   getProfile,
   updateProfile,
+  uploadAvatar,
+  deleteAvatar,
   verifyEmail,
   resendVerification,
   forgotPassword,

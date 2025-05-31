@@ -120,6 +120,24 @@ const createTables = async (connection) => {
       INDEX idx_is_default (is_default)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 
+    // Board columns table
+    `CREATE TABLE IF NOT EXISTS board_columns (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      board_id INT NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      status_mapping VARCHAR(50) NOT NULL,
+      position INT NOT NULL,
+      wip_limit INT NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+      INDEX idx_board_id (board_id),
+      INDEX idx_position (position),
+      INDEX idx_status_mapping (status_mapping),
+      INDEX idx_is_active (is_active)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
     // Sprints table
     `CREATE TABLE IF NOT EXISTS sprints (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -158,6 +176,7 @@ const createTables = async (connection) => {
       assignee_id INT NULL,
       reporter_id INT NOT NULL,
       blocked_reason TEXT NULL,
+      issue_order INT DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
@@ -170,7 +189,8 @@ const createTables = async (connection) => {
       INDEX idx_priority (priority),
       INDEX idx_assignee_id (assignee_id),
       INDEX idx_reporter_id (reporter_id),
-      INDEX idx_issue_type (issue_type)
+      INDEX idx_issue_type (issue_type),
+      INDEX idx_issue_order (issue_order)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 
     // Refresh tokens table
@@ -243,6 +263,25 @@ const createTables = async (connection) => {
       INDEX idx_user_id (user_id),
       INDEX idx_token (token),
       INDEX idx_expires_at (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
+
+    // User activities table
+    `CREATE TABLE IF NOT EXISTS user_activities (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      action VARCHAR(100) NOT NULL,
+      resource_type VARCHAR(50) NULL,
+      resource_id INT NULL,
+      details JSON NULL,
+      ip_address VARCHAR(45) NULL,
+      user_agent TEXT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      INDEX idx_user_id (user_id),
+      INDEX idx_action (action),
+      INDEX idx_resource_type (resource_type),
+      INDEX idx_resource_id (resource_id),
+      INDEX idx_created_at (created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`
   ];
 
