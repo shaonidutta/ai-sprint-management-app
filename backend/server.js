@@ -92,6 +92,7 @@ const boardRoutes = require('./routes/boards');
 const issueRoutes = require('./routes/issues');
 const sprintRoutes = require('./routes/sprints');
 const activityRoutes = require('./routes/activities');
+const kanbanRoutes = require('./routes/kanban');
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
@@ -100,6 +101,7 @@ app.use('/api/v1/boards', boardRoutes);
 app.use('/api/v1/issues', issueRoutes);
 app.use('/api/v1/sprints', sprintRoutes);
 app.use('/api/v1/activities', activityRoutes);
+app.use('/api/v1/kanban', kanbanRoutes);
 
 // API root endpoint
 app.get('/api/v1', (req, res) => {
@@ -114,6 +116,7 @@ app.get('/api/v1', (req, res) => {
       issues: '/api/v1/issues',
       sprints: '/api/v1/sprints',
       activities: '/api/v1/activities',
+      kanban: '/api/v1/kanban',
       health: '/health'
     }
   });

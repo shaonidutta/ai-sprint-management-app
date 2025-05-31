@@ -19,6 +19,7 @@ class Issue {
     this.assignee_id = data.assignee_id || data.assigneeId || null;
     this.reporter_id = data.reporter_id || data.reporterId || null;
     this.blocked_reason = data.blocked_reason || data.blockedReason || null;
+    this.issue_order = data.issue_order || data.issueOrder || 0;
     this.created_at = data.created_at || data.createdAt || null;
     this.updated_at = data.updated_at || data.updatedAt || null;
   }
@@ -135,14 +136,23 @@ class Issue {
         }
       }
 
+      // Get the next order for this status
+      const orderQuery = `
+        SELECT COALESCE(MAX(issue_order), 0) + 1 as next_order
+        FROM issues
+        WHERE board_id = ? AND status = ?
+      `;
+      const orderResult = await database.query(orderQuery, [issue.board_id, issue.status]);
+      issue.issue_order = orderResult[0].next_order;
+
       const query = `
         INSERT INTO issues (
           board_id, sprint_id, title, description, issue_type, status, priority,
           story_points, original_estimate, time_spent, time_remaining,
-          assignee_id, reporter_id, blocked_reason
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          assignee_id, reporter_id, blocked_reason, issue_order
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
-      
+
       const values = [
         issue.board_id,
         issue.sprint_id,
@@ -157,7 +167,8 @@ class Issue {
         issue.time_remaining,
         issue.assignee_id,
         issue.reporter_id,
-        issue.blocked_reason ? issue.blocked_reason.trim() : null
+        issue.blocked_reason ? issue.blocked_reason.trim() : null,
+        issue.issue_order
       ];
       
       const result = await database.query(query, values);
