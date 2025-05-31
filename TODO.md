@@ -98,8 +98,8 @@
 **Status**: ⏳ Pending | **Priority**: Must Have
 
 ### 3.1 User Profile Management
-- [ ] **M3.1.1** Create user profile endpoint (GET /api/auth/me)
-- [ ] **M3.1.2** Implement update profile endpoint
+- [x] **M3.1.1** Create user profile endpoint (GET /api/auth/me) ✅ COMPLETED
+- [x] **M3.1.2** Implement update profile endpoint ✅ COMPLETED
 - [ ] **M3.1.3** Add avatar upload functionality
 - [ ] **M3.1.4** Create user profile UI component
 - [ ] **M3.1.5** Implement profile edit form

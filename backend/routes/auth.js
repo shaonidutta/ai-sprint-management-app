@@ -12,7 +12,8 @@ const {
   verifyEmailSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
-  changePasswordSchema
+  changePasswordSchema,
+  updateProfileSchema
 } = require('../validators/userValidator');
 
 // Import middleware
@@ -63,6 +64,17 @@ router.post('/logout',
 router.get('/me',
   authMiddleware.authenticate,
   authController.getProfile
+);
+
+/**
+ * @route   PUT /api/v1/auth/me
+ * @desc    Update current user profile
+ * @access  Private
+ */
+router.put('/me',
+  authMiddleware.authenticate,
+  validateRequest(updateProfileSchema),
+  authController.updateProfile
 );
 
 /**

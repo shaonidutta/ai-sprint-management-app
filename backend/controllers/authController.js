@@ -477,12 +477,55 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+// Update user profile
+const updateProfile = async (req, res, next) => {
+  try {
+    const { first_name, last_name, avatar_url } = req.body;
+    const userId = req.user.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    // Update user fields if provided
+    if (first_name !== undefined) {
+      user.first_name = first_name.trim();
+    }
+    if (last_name !== undefined) {
+      user.last_name = last_name.trim();
+    }
+    if (avatar_url !== undefined) {
+      user.avatar_url = avatar_url.trim() || null;
+    }
+
+    // Save updated user
+    await user.save();
+
+    logger.info(`Profile updated for user: ${user.email}`, { userId: user.id });
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully.',
+      data: {
+        user: user.toJSON()
+      }
+    });
+
+  } catch (error) {
+    logger.error('Update profile error:', error);
+    next(new AppError('Profile update failed. Please try again.', 500));
+  }
+};
+
 module.exports = {
   register,
   login,
   refreshToken,
   logout,
   getProfile,
+  updateProfile,
   verifyEmail,
   resendVerification,
   forgotPassword,
