@@ -109,7 +109,11 @@ class Project {
         INSERT INTO user_projects (user_id, project_id, role, created_at)
         VALUES (?, ?, 'Admin', NOW())
       `, [projectData.owner_id, result.insertId]);
-      
+
+      // Create default board for the project
+      const Board = require('./Board');
+      await Board.createDefaultBoard(result.insertId, projectData.owner_id);
+
       // Return the created project
       return await Project.findById(result.insertId);
     } catch (error) {

@@ -85,10 +85,16 @@ app.get('/health', async (req, res) => {
 // Import routes
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
+const boardRoutes = require('./routes/boards');
+const issueRoutes = require('./routes/issues');
+const sprintRoutes = require('./routes/sprints');
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/projects', projectRoutes);
+app.use('/api/v1/boards', boardRoutes);
+app.use('/api/v1/issues', issueRoutes);
+app.use('/api/v1/sprints', sprintRoutes);
 
 // API root endpoint
 app.get('/api/v1', (req, res) => {
@@ -99,6 +105,9 @@ app.get('/api/v1', (req, res) => {
     endpoints: {
       auth: '/api/v1/auth',
       projects: '/api/v1/projects',
+      boards: '/api/v1/boards',
+      issues: '/api/v1/issues',
+      sprints: '/api/v1/sprints',
       health: '/health'
     }
   });

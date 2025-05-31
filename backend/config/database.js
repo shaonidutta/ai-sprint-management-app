@@ -16,11 +16,14 @@ class Database {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true,
+        queueLimit: 0,
         charset: 'utf8mb4',
-        timezone: '+00:00'
+        timezone: '+00:00',
+        supportBigNumbers: true,
+        bigNumberStrings: true,
+        waitForConnections: true,
+        idleTimeout: 60000,
+        maxIdle: 10
       });
 
       // Test the connection

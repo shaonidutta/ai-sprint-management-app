@@ -20,7 +20,7 @@ class EmailService {
       }
 
       // Create transporter
-      this.transporter = nodemailer.createTransporter({
+      this.transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT),
         secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
@@ -38,11 +38,21 @@ class EmailService {
         })
       });
 
-      // Verify connection
-      await this.transporter.verify();
-      this.isConfigured = true;
-      logger.info('Email service initialized successfully');
-      return true;
+      // Verify connection (skip in development if credentials are invalid)
+      try {
+        await this.transporter.verify();
+        this.isConfigured = true;
+        logger.info('Email service initialized successfully');
+        return true;
+      } catch (verifyError) {
+        if (process.env.NODE_ENV === 'development') {
+          logger.warn('Email service verification failed in development mode. Email features will be disabled.', { error: verifyError.message });
+          this.isConfigured = false;
+          return false;
+        } else {
+          throw verifyError;
+        }
+      }
 
     } catch (error) {
       logger.error('Failed to initialize email service:', error);

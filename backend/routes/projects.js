@@ -4,6 +4,7 @@ const router = express.Router();
 // Import controllers
 const projectController = require('../controllers/projectController');
 const teamController = require('../controllers/teamController');
+const BoardController = require('../controllers/boardController');
 
 // Import validators
 const { 
@@ -127,6 +128,30 @@ router.put('/:id/team/:user_id',
   validateParams(projectUserIdSchema),
   validateRequest(updateTeamMemberRoleSchema),
   teamController.updateTeamMemberRole
+);
+
+// Board Management Routes
+
+/**
+ * @route   GET /api/v1/projects/:id/boards
+ * @desc    Get boards for a project
+ * @access  Private
+ */
+router.get('/:id/boards',
+  authMiddleware.authenticate,
+  validateParams(projectIdSchema),
+  BoardController.getProjectBoards
+);
+
+/**
+ * @route   POST /api/v1/projects/:id/boards
+ * @desc    Create new board for project
+ * @access  Private (Admin/Manager only)
+ */
+router.post('/:id/boards',
+  authMiddleware.authenticate,
+  validateParams(projectIdSchema),
+  BoardController.createBoard
 );
 
 module.exports = router;

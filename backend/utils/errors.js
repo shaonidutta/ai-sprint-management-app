@@ -131,7 +131,7 @@ const formatSuccessResponse = (data = null, message = null, pagination = null) =
  */
 const createPagination = (page, limit, total) => {
   const totalPages = Math.ceil(total / limit);
-  
+
   return {
     page: parseInt(page),
     limit: parseInt(limit),
@@ -140,6 +140,27 @@ const createPagination = (page, limit, total) => {
     hasNext: page < totalPages,
     hasPrev: page > 1
   };
+};
+
+/**
+ * Express validator error handler middleware
+ */
+const handleValidationErrors = (req, res, next) => {
+  const { validationResult } = require('express-validator');
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const validationErrors = errors.array().map(error => ({
+      field: error.path || error.param,
+      message: error.msg,
+      value: error.value
+    }));
+
+    const validationError = new ValidationError('Validation failed', validationErrors);
+    return res.status(400).json(formatErrorResponse(validationError));
+  }
+
+  next();
 };
 
 module.exports = {
@@ -156,5 +177,6 @@ module.exports = {
   QuotaExceededError,
   formatErrorResponse,
   formatSuccessResponse,
-  createPagination
+  createPagination,
+  handleValidationErrors
 };
