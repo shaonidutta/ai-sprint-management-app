@@ -23,30 +23,30 @@
 - [x] **M1.1.2** Initialize React.js frontend project with Vite ✅ COMPLETED
 - [x] **M1.1.3** Setup project folder structure (backend/frontend separation) ✅ COMPLETED
 - [x] **M1.1.4** Create .env.example files for both backend and frontend ✅ COMPLETED
-- [ ] **M1.1.5** Setup .gitignore files for Node.js and React
-- [ ] **M1.1.6** Initialize package.json with basic dependencies
+- [x] **M1.1.5** Setup .gitignore files for Node.js and React ✅ COMPLETED
+- [x] **M1.1.6** Initialize package.json with basic dependencies ✅ COMPLETED
 
 ### 1.2 Database Foundation
-- [ ] **M1.2.1** Install MySQL 8.0+ locally
+- [x] **M1.2.1** Install MySQL 8.0+ locally ✅ COMPLETED
 - [ ] **M1.2.2** Create database schema: `sprint_management`
-- [ ] **M1.2.3** Setup database connection configuration
-- [ ] **M1.2.4** Create database migration system
-- [ ] **M1.2.5** Implement core tables: users, projects, user_projects
-- [ ] **M1.2.6** Add database indexes for performance
+- [x] **M1.2.3** Setup database connection configuration ✅ COMPLETED
+- [x] **M1.2.4** Create database migration system ✅ COMPLETED
+- [x] **M1.2.5** Implement core tables: users, projects, user_projects ✅ COMPLETED
+- [x] **M1.2.6** Add database indexes for performance ✅ COMPLETED
 
 ### 1.3 Backend Core Setup
-- [ ] **M1.3.1** Install Express.js and core middleware
-- [ ] **M1.3.2** Setup CORS configuration
-- [ ] **M1.3.3** Implement request logging middleware
-- [ ] **M1.3.4** Setup error handling middleware
-- [ ] **M1.3.5** Create basic API route structure
-- [ ] **M1.3.6** Implement health check endpoint
+- [x] **M1.3.1** Install Express.js and core middleware ✅ COMPLETED
+- [x] **M1.3.2** Setup CORS configuration ✅ COMPLETED
+- [x] **M1.3.3** Implement request logging middleware ✅ COMPLETED
+- [x] **M1.3.4** Setup error handling middleware ✅ COMPLETED
+- [x] **M1.3.5** Create basic API route structure ✅ COMPLETED
+- [x] **M1.3.6** Implement health check endpoint ✅ COMPLETED
 
 ### 1.4 Frontend Core Setup
-- [ ] **M1.4.1** Install React Router v6
-- [ ] **M1.4.2** Install Tailwind CSS and configure
-- [ ] **M1.4.3** Setup Atlassian Design System tokens
-- [ ] **M1.4.4** Install Axios for API calls
+- [x] **M1.4.1** Install React Router v6 ✅ COMPLETED
+- [x] **M1.4.2** Install Tailwind CSS and configure ✅ COMPLETED
+- [x] **M1.4.3** Setup Atlassian Design System tokens ✅ COMPLETED
+- [x] **M1.4.4** Install Axios for API calls ✅ COMPLETED
 - [ ] **M1.4.5** Create basic component structure
 - [ ] **M1.4.6** Setup React Context for state management
 
