@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/config/axiosConfig';
 
 const AuthContext = createContext(null);
 
@@ -30,10 +30,10 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get('/api/auth/me', {
+      const response = await axiosInstance.get('/v1/auth/me', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      setUser(response.data);
+      setUser(response.data.data.user);
     } catch (err) {
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
@@ -45,20 +45,20 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null);
-      const response = await axios.post('/api/auth/login', { email, password });
-      const { token, refreshToken, user: userData } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
+      const response = await axiosInstance.post('/v1/auth/login', { email, password });
+      const { user: userData, tokens } = response.data.data;
+
+      localStorage.setItem('token', tokens.access_token);
+      localStorage.setItem('refreshToken', tokens.refresh_token);
       setUser(userData);
-      
-      if (!userData.emailVerified) {
+
+      if (!userData.email_verified) {
         navigate('/verify-email');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred during login');
+      setError(err.response?.data?.error?.message || 'An error occurred during login');
       throw err;
     }
   };
@@ -66,11 +66,11 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setError(null);
-      const response = await axios.post('/api/auth/register', userData);
+      const response = await axiosInstance.post('/v1/auth/register', userData);
       navigate('/verify-email');
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred during registration');
+      setError(err.response?.data?.error?.message || 'An error occurred during registration');
       throw err;
     }
   };
@@ -85,9 +85,9 @@ export const AuthProvider = ({ children }) => {
   const forgotPassword = async (email) => {
     try {
       setError(null);
-      await axios.post('/api/auth/forgot-password', { email });
+      await axiosInstance.post('/v1/auth/forgot-password', { email });
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+      setError(err.response?.data?.error?.message || 'An error occurred');
       throw err;
     }
   };
@@ -95,10 +95,10 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (token, password) => {
     try {
       setError(null);
-      await axios.post('/api/auth/reset-password', { token, password });
+      await axiosInstance.post('/v1/auth/reset-password', { token, password });
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+      setError(err.response?.data?.error?.message || 'An error occurred');
       throw err;
     }
   };
@@ -106,11 +106,11 @@ export const AuthProvider = ({ children }) => {
   const verifyEmail = async (token) => {
     try {
       setError(null);
-      await axios.post('/api/auth/verify-email', { token });
+      await axiosInstance.post('/v1/auth/verify-email', { token });
       await fetchUser();
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred');
+      setError(err.response?.data?.error?.message || 'An error occurred');
       throw err;
     }
   };
