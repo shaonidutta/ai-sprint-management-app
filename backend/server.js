@@ -84,9 +84,11 @@ app.get('/health', async (req, res) => {
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const projectRoutes = require('./routes/projects');
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/projects', projectRoutes);
 
 // API root endpoint
 app.get('/api/v1', (req, res) => {
@@ -96,6 +98,7 @@ app.get('/api/v1', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       auth: '/api/v1/auth',
+      projects: '/api/v1/projects',
       health: '/health'
     }
   });
