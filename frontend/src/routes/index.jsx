@@ -4,8 +4,9 @@ import ResetPassword from '../pages/auth/ResetPassword';
 import LandingPage from '../pages/landing/LandingPage';
 import RootLayout from '../components/Layout/RootLayout';
 import Login from '../pages/auth/Login';
+import EmailVerificationPending from '../pages/auth/EmailVerificationPending';
 import Register from '../pages/auth/Register';
-import VerifyEmail from '../pages/auth/VerifyEmail';
+
 
 export const routes = [
   {
@@ -31,6 +32,10 @@ export const routes = [
       {
         path: '/reset-password',
         element: <ResetPassword />,
+      },
+      {
+        path: '/verify-email',
+        element: <EmailVerificationPending />,
       }
     ]
   }

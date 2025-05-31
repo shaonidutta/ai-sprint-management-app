@@ -1,4 +1,5 @@
-export { default as KanbanBoard } from './KanbanBoard';
-export { default as KanbanColumn } from './KanbanColumn';
+export { default as Board } from './Board';
 export { default as IssueCard } from './IssueCard';
-export { default as IssueModal } from './IssueModal'; 
+export { default as IssueList } from './IssueList';
+export { default as CreateIssueForm } from './CreateIssueForm';
+export { default as CreateBoardForm } from './CreateBoardForm'; 
